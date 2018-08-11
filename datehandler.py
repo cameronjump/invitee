@@ -43,5 +43,3 @@ def test():
 
 	zone = getTimeZone('pacific')
 	print(zone)
-
-test()

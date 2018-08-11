@@ -1,0 +1,28 @@
+{
+  "kind": "calendar#event",
+  "summary": "Event",
+  "location": "",
+  "start": {
+    "dateTime": "",
+    "timeZone": "America/Chicago"
+  },
+  "end": {
+    "dateTime": "",
+    "timeZone": "America/Chicago"
+  },
+  "sequence": 0,
+  "attendees": [
+    {
+      "email": "crjump@ostatemail.okstate.edu"
+    }
+  ],
+  "reminders": {
+    "useDefault": "False",
+    "overrides": [
+      {
+        "method": "popup",
+        "minutes": 30
+      }
+    ]
+  }
+}
