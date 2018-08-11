@@ -1,5 +1,5 @@
-import sys
 from __future__ import print_function
+import sys
 import datetime
 from googleapiclient.discovery import build
 from httplib2 import Http
@@ -10,9 +10,10 @@ import datehandler
 def main(argv):
     service = authenticate.createService()
     createEvent(service)
+    #displayNextTen(service)
 
 def createEvent(service):
-	date = datehandler.getDateForDayOfWeek('saturday')
+	date = datehandler.getDateForDayOfWeek('sunday')
 	summary = 'pizza'
 	description = ''
 	location = 'my house'
@@ -56,8 +57,9 @@ def displayNextTen(service):
     if not events:
         print('No upcoming events found.')
     for event in events:
-        start = event['start'].get('dateTime', event['start'].get('date'))
+        print(event)
         print(start, event['summary'])
+        break
 
 if __name__ == '__main__':
     main(sys.argv)

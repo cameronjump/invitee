@@ -9,7 +9,7 @@ def getDateForDayOfWeek(dayofweek):
 	weekday = {'monday':0,'tuesday':1,'wednesday':2,'thursday':3,'friday':4,'saturday':5, 'sunday':6}
 	try:
 		while date.weekday() != weekday[dayofweek]:
-			date = date + datetime.timedelta(days=1)
+			date += datetime.timedelta(days=1)
 	except Exception as e:
 		print('Given weekday invalid.')
 		raise e
@@ -33,6 +33,7 @@ def startTime(date, time):
 
 def endTime(date, length):
 	date += datetime.timedelta(hours=int(length))
+	
 	return date
 	
 
