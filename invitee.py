@@ -1,14 +1,50 @@
+import sys
 from __future__ import print_function
 import datetime
 from googleapiclient.discovery import build
 from httplib2 import Http
 from oauth2client import file, client, tools
 import authenticate
+import datehandler
 
-def main():
-    service = authenticate.authenticate()
+def main(argv):
+    service = authenticate.createService()
     createEvent(service)
 
+def createEvent(service):
+	date = datehandler.getDateForDayOfWeek('saturday')
+	summary = 'pizza'
+	description = ''
+	location = 'my house'
+	weekday = 'saturday'
+	timezone = datehandler.getTimeZone('central')
+	time = '12:30'
+	length = '1'
+	date = datehandler.getDateForDayOfWeek(weekday)
+	starttime = datehandler.startTime(date, time)
+	endtime = datehandler.endTime(starttime, length)
+	event = {
+      'summary': summary,
+      'location': location,
+      'description': description,
+      'start': {
+        'dateTime': starttime.isoformat(),
+        'timeZone': timezone,
+      },
+      'end': {
+        'dateTime': endtime.isoformat(),
+        'timeZone': timezone,
+      },
+      'attendees': [
+        {'email': 'cameronjump@gmail.com'},
+      ],
+      'reminders': {
+        'useDefault': True,
+      }
+    }
+	service.events().insert(calendarId='primary', body=event).execute()
+
+def displayNextTen(service):
     # Call the Calendar API
     now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
     print('Getting the upcoming 10 events')
@@ -23,30 +59,5 @@ def main():
         start = event['start'].get('dateTime', event['start'].get('date'))
         print(start, event['summary'])
 
-def createEvent(service):
-	event = {
-      'summary': 'Google I/O 2015',
-      'location': '800 Howard St., San Francisco, CA 94103',
-      'description': 'A chance to hear more about Google\'s developer products.',
-      'start': {
-        'dateTime': str(datetime.datetime.now() + datetime.timedelta(hours=2)),
-        'timeZone': 'America/Chicago',
-      },
-      'end': {
-        'dateTime': str(datetime.datetime.now() + datetime.timedelta(hours=4)),
-        'timeZone': 'America/Chicago',
-      },
-      'recurrence': [
-        'RRULE:FREQ=DAILY;COUNT=1'
-      ],
-      'attendees': [
-        {'email': 'cameronjump@gmail.com'},
-      ],
-      'reminders': {
-        'useDefault': True,
-      }
-    }
-	service.events().insert(calendarId='primary', body=event).execute()
-
 if __name__ == '__main__':
-    main()
+    main(sys.argv)

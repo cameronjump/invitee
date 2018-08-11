@@ -4,7 +4,7 @@ from oauth2client import file, client, tools
 
 SCOPES = 'https://www.googleapis.com/auth/calendar'
 
-def authenticate():
+def createService():
     store = file.Storage('token.json')
     creds = store.get()
     if not creds or creds.invalid:
