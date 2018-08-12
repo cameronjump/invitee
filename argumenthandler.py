@@ -6,6 +6,7 @@ import json
 
 import authenticate
 import datehandler
+import contacthandler
 
 
 def passArgument(argv):
@@ -17,7 +18,7 @@ def buildEvent(argv):
 	#event = {}
 	with open('default.json') as f:
 		event = json.load(f)
-
+	attendees = []
 	time = ''
 	weekday = ''
 	length = '1'
@@ -25,17 +26,20 @@ def buildEvent(argv):
 	for i in iterator:
 		if i == '-s':
 			event['summary'] = next(iterator)
-		if i == '-w':
+		elif i == '-w':
 			weekday = next(iterator)
-		if i == '-t':
+		elif i == '-t':
 			time = next(iterator)
-		if i == '-l':
+		elif i == '-l':
 			length = next(iterator)
+		elif i == '-c':
+			attendees.append({'email': contacthandler.getEmail(next(iterator))})
 	date = datehandler.getDateForDayOfWeek(weekday)
 	starttime = datehandler.startTime(date, time)
 	endtime = datehandler.endTime(starttime, length)
 	event['start']['dateTime'] = starttime.isoformat()
 	event['end']['dateTime'] = endtime.isoformat()
+	event['attendees'] = attendees
 	return event
 
 def createEvent(service, summary):
