@@ -8,24 +8,18 @@ import authenticate
 import datehandler
 import contacthandler
 
+attendees = []
+time = None
+weekday = None
+length = '1'
+summary = ''
 
-def passArgument(argv):
-	service = authenticate.createService()
-	event = buildEvent(argv)
-	service.events().insert(calendarId='primary', body=event).execute()
-
-def buildEvent(argv):
-	#event = {}
-	with open('default.json') as f:
-		event = json.load(f)
-	attendees = []
-	time = ''
-	weekday = ''
-	length = '1'
+#this thing is pretee uglee
+def parseArguments(argv):
 	iterator = iter(argv)
 	for i in iterator:
 		if i == '-s':
-			event['summary'] = next(iterator)
+			summary = next(iterator)
 		elif i == '-w':
 			weekday = next(iterator)
 		elif i == '-t':
@@ -34,57 +28,44 @@ def buildEvent(argv):
 			length = next(iterator)
 		elif i == '-c':
 			attendees.append({'email': contacthandler.getEmail(next(iterator))})
-	date = datehandler.getDateForDayOfWeek(weekday)
-	starttime = datehandler.startTime(date, time)
-	endtime = datehandler.endTime(starttime, length)
-	event['start']['dateTime'] = starttime.isoformat()
-	event['end']['dateTime'] = endtime.isoformat()
-	event['attendees'] = attendees
-	return event
+		elif i == '-viewcontacts':
+			contacthandler.displayContacts()
+		elif i == '-addcontact':
+			contacthandler.addContacts(next(iterator), next(iterator))
 
-def createEvent(service, summary):
-	date = datehandler.getDateForDayOfWeek('sunday')
-	description = ''
-	location = 'my house'
-	weekday = 'saturday'
-	timezone = datehandler.getTimeZone('central')
-	time = '12:30'
-	length = '1'
-	date = datehandler.getDateForDayOfWeek(weekday)
-	starttime = datehandler.startTime(date, time)
-	endtime = datehandler.endTime(starttime, length)
-	event = {
-	  'kind': 'calendar#event',
-	  'summary': summary,
-	  'location': 'my house',
-	  'start': {
-	    'dateTime': '2018-08-11T10:30:00-05:00',
-	    'timeZone': 'America/Chicago'
-	  },
-	  'end': {
-	    'dateTime': '2018-08-11T11:30:00-05:00',
-	    'timeZone': 'America/Chicago'
-	  },
-	  'sequence': 0,
-	  'attendees': [
-	    {
-	      'email': 'cameronjump@gmail.com',
-	    },
-	    {
-	      'email': 'crjump@ostatemail.okstate.edu',
-	    }
-	  ],
-	  'reminders': {
-	    'useDefault': False,
-	    'overrides': [
-	      {
-	        'method': 'popup',
-	        'minutes': 30
-	      }
-	    ]
-	  }
-	}
+	print(time)
+	createAndUploadEvent()
+
+def createAndUploadEvent():
+	print(time)
+	if checkArguments():
+		event = readTemplate()
+		date = datehandler.getDateForDayOfWeek(weekday)
+		starttime = datehandler.startTime(date, time)
+		endtime = datehandler.endTime(starttime, length)
+		event['start']['dateTime'] = starttime.isoformat()
+		event['end']['dateTime'] = endtime.isoformat()
+		event['attendees'] = attendees
+		checkEvent(event)
+		uploadEvent()
+
+def uploadEvent(event):
+	service = authenticate.createService()
 	service.events().insert(calendarId='primary', body=event).execute()
+
+def readTemplate():
+	with open('default.json') as f:
+			default = json.load(f)	
+			return default
+
+def checkArguments():
+	if time == None:
+		print('Event not created missing time.')
+		return False
+	if weekday == None:
+		print('Event not created missing weekday.')
+		return False
+	return True
 
 def printNextEvent(service):
     # Call the Calendar API
