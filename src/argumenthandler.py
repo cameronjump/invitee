@@ -56,7 +56,7 @@ def uploadEvent(event):
 	service.events().insert(calendarId='primary', body=event).execute()
 
 def readTemplate():
-	with open('default.json') as f:
+	with open('./src/default.json') as f:
 			default = json.load(f)	
 			return default
 

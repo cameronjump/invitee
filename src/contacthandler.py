@@ -2,7 +2,7 @@ import json
 
 def readContacts():
 	try:
-		with open('contacts.json') as f:
+		with open('./src/contacts.json') as f:
 			contacts = json.load(f)	
 			return contacts
 	except Exception as e:
@@ -12,7 +12,7 @@ def readContacts():
 		return contacts
 
 def writeContacts(contacts):
-	with open('contacts.json', 'w') as f:
+	with open('./src/contacts.json', 'w') as f:
 		json.dump(contacts, f)
 
 def addContacts(name, email):
