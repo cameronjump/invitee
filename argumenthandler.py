@@ -14,7 +14,7 @@ def passArgument(argv):
 	service.events().insert(calendarId='primary', body=event).execute()
 
 def buildEvent(argv):
-	event = {}
+	#event = {}
 	with open('default.json') as f:
 		event = json.load(f)
 
@@ -37,7 +37,6 @@ def buildEvent(argv):
 	event['start']['dateTime'] = starttime.isoformat()
 	event['end']['dateTime'] = endtime.isoformat()
 	return event
-
 
 def createEvent(service, summary):
 	date = datehandler.getDateForDayOfWeek('sunday')
