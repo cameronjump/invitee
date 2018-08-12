@@ -8,46 +8,48 @@ import authenticate
 import datehandler
 import contacthandler
 
-attendees = []
-time = None
-weekday = None
-length = '1'
-summary = ''
-
 #this thing is pretee uglee
 def parseArguments(argv):
+	#used to build paramters
+	config = {'time':None,'weekday':None,'length':'1'}
+
+	#placed directly in to event
+	param = {'attendees':[],'summary':'','location':''}
+
 	iterator = iter(argv)
 	for i in iterator:
 		if i == '-s':
-			summary = next(iterator)
+			param['summary'] = next(iterator)
 		elif i == '-w':
-			weekday = next(iterator)
+			config['weekday'] = next(iterator)
 		elif i == '-t':
-			time = next(iterator)
+			config['time'] = next(iterator)
 		elif i == '-l':
-			length = next(iterator)
+			param['location'] = next(iterator)
+		elif i == '-length':
+			config['length'] = next(iterator)
 		elif i == '-c':
-			attendees.append({'email': contacthandler.getEmail(next(iterator))})
+			param['attendees'].append({'email': contacthandler.getEmail(next(iterator))})
 		elif i == '-viewcontacts':
 			contacthandler.displayContacts()
 		elif i == '-addcontact':
 			contacthandler.addContacts(next(iterator), next(iterator))
+	createAndUploadEvent(config, param)
 
-	print(time)
-	createAndUploadEvent()
-
-def createAndUploadEvent():
-	print(time)
-	if checkArguments():
+def createAndUploadEvent(config, param):
+	if checkArguments(config):
 		event = readTemplate()
-		date = datehandler.getDateForDayOfWeek(weekday)
-		starttime = datehandler.startTime(date, time)
-		endtime = datehandler.endTime(starttime, length)
+
+		date = datehandler.getDateForDayOfWeek(config['weekday'])
+		starttime = datehandler.startTime(date, config['time'])
+		endtime = datehandler.endTime(starttime, config['length'])
+
+		event.update(param)
+
 		event['start']['dateTime'] = starttime.isoformat()
 		event['end']['dateTime'] = endtime.isoformat()
-		event['attendees'] = attendees
-		checkEvent(event)
-		uploadEvent()
+	
+		uploadEvent(event)
 
 def uploadEvent(event):
 	service = authenticate.createService()
@@ -58,11 +60,11 @@ def readTemplate():
 			default = json.load(f)	
 			return default
 
-def checkArguments():
-	if time == None:
+def checkArguments(config):
+	if config['time'] == None:
 		print('Event not created missing time.')
 		return False
-	if weekday == None:
+	if config['weekday'] == None:
 		print('Event not created missing weekday.')
 		return False
 	return True
